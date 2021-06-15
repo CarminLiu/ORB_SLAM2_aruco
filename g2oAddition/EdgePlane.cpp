@@ -7,6 +7,7 @@
 
 namespace g2o
 {
+
 bool EdgePlaneMarker::read(std::istream& is)
 {
     is >> _measurement >> information()(0,0);
@@ -14,9 +15,21 @@ bool EdgePlaneMarker::read(std::istream& is)
 }
 
 bool EdgePlaneMarker::write(std::ostream& os) const
-  {
+{
     os << measurement() << " " << information()(0,0);
     return os.good();
-  }
+}
+
+bool EdgePlanePoint::read(std::istream& is)
+{
+    is >> _measurement >> information()(0,0);
+    return true;
+}
+
+bool EdgePlanePoint::write(std::ostream& os) const
+{
+    os << measurement() << " " << information()(0,0);
+    return os.good();
+}
     
 } // namespace g2o

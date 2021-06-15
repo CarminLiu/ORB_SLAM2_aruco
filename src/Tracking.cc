@@ -225,7 +225,7 @@ void Tracking::Track()
             {
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
-                cout<<"#planes:\t"<< mpMap->GetAllMapPlanes().size()<<endl;
+                // cout<<"#planes:\t"<< mpMap->GetAllMapPlanes().size()<<endl;
 
                 // add TrackByAruco() !!! 这里忽略了很多条件，首先假设第一二帧都有marker
                 // TODO 先做一个判断，判断是否有良好的Aruco可以提供初值
@@ -300,7 +300,7 @@ void Tracking::Track()
                     if(isArucoGood)
                     {
                         bOK = TrackByAruco();
-                        cout<<bOK<<"\t\033[33mTrackByAruco()\033[0m"<<endl;
+                        // cout<<bOK<<"\t\033[33mTrackByAruco()\033[0m"<<endl;
                         // if(!bOK && !mVelocity.empty()){
                         //     bOK = TrackWithMotionModel();
                         //     // cout<<bOK<<"\t\t\t\033[35mAfter TrackByMarker(), TrackWithMotionModel()\033[0m"<<endl; 

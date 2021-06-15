@@ -87,6 +87,7 @@ protected:
     //* Add by liujiamin
     void CreateArucoMapPoints();
     Eigen::Vector4d PlaneFitting(const std::vector<Eigen::Vector3d> &plane_pts, Eigen::Vector3d &center);
+    void MapPointRelatedAruco();
 
     void MapPointCulling();
     void SearchInNeighbors();

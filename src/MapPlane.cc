@@ -28,6 +28,23 @@ void MapPlane::AddMapAruco(MapAruco* pMA)
     mspMapArucos.insert(pMA);
 }
 
+void MapPlane::SetCoeffs(const Eigen::Vector4d &coe)
+{
+    unique_lock<mutex> lock(mMutexFeatures);
+    mCoeffs = coe;
+    mNormal[0] = coe[0];
+    mNormal[1] = coe[1];
+    mNormal[2] = coe[2];
+    mDis = -coe[3];
+    mPoint[2] = -(mPoint[0]*coe[0]+mPoint[1]*coe[1]+coe[3])/coe[2];
+}
+
+Eigen::Vector4d MapPlane::GetCoeffs()
+{
+    unique_lock<mutex> lock(mMutexFeatures);
+    return mCoeffs;
+}
+
 Eigen::Vector3d MapPlane::GetNormal()
 {
     unique_lock<mutex> lock(mMutexFeatures);
@@ -38,6 +55,12 @@ double MapPlane::GetDis()
 {
     unique_lock<mutex> lock(mMutexFeatures);
     return mDis;
+}
+
+int MapPlane::GetID()
+{
+    unique_lock<mutex> lock(mMutexFeatures);
+    return mID;
 }
 
 Eigen::Vector3d MapPlane::GetOnePoint()

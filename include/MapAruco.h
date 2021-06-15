@@ -52,7 +52,7 @@ public:
     double  GetArucoLength();
     MapPoint*     GetMapPoint(const size_t & idx);
     aruco::Marker GetAruco();
-    
+    MapPlane*     GetPlane();
     
     cv::Point3f get3DPointsLocalRefSystem(size_t i);
     

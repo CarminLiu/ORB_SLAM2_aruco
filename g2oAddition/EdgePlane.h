@@ -40,25 +40,29 @@ public:
     void computeError() {
         //plane
         const VertexPlane* pl = static_cast<const VertexPlane*>(_vertices[0]);
-        //camera
-        const VertexSE3Expmap* c2g = static_cast<const VertexSE3Expmap*>(_vertices[1]);
+        //marker
+        const VertexSE3Expmap* g2m = static_cast<const VertexSE3Expmap*>(_vertices[1]);
 
+        point = g2m->estimate().map(point);
+        // pl->estimate().coeffs();
+        g2o::Vector3D pNor = pl->estimate().normal();
+        double pDis = pl->estimate().distance();
+        g2o::Vector3D pPL;
+        pPL[0] = pInPlane[0];
+        pPL[1] = pInPlane[1];
+        pPL[2] = -(pPL[0]*pNor[0]+pPL[1]*pNor[1]-pDis)/pNor[2];
+
+        g2o::Vector3D p = point - pPL;
         
-        // auto T_c2m = c2g->estimate() * g2m->estimate();
-        // g2o::Vector3D p_c2m = T_c2m.map(point);
-        // Vector2d obs(_measurement);
-        // double projx=( p_c2m(0)/p_c2m(2)) *fx +cx;
-        // double projy=( p_c2m(1)/p_c2m(2)) *fy +cy;
-        // _error(0) = obs(0) - projx;
-        // _error(1) = obs(1) - projy;
+        _error(0) = p.dot( pl->estimate().normal() ); 
     }
 
     g2o::Vector3D point;
-    double fx, fy, cx, cy;
+    g2o::Vector3D pInPlane;
 
 };
 
-class EdgePlanePoint: public g2o::BaseBinaryEdge<1, double, Plane3D, VertexSBAPointXYZ>
+class EdgePlanePoint: public g2o::BaseBinaryEdge<1, double, VertexPlane, VertexSBAPointXYZ>
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -69,6 +73,21 @@ public:
 
     virtual bool write(std::ostream& os) const;
 
+    void computeError() {
+        const VertexPlane* pl = static_cast<const VertexPlane*>(_vertices[0]);
+        const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[1]);
+        
+        g2o::Vector3D pNor = pl->estimate().normal();
+        double pDis = pl->estimate().distance();
+        g2o::Vector3D pPL;
+        pPL[0] = pInPlane[0];
+        pPL[1] = pInPlane[1];
+        pPL[2] = -(pPL[0]*pNor[0]+pPL[1]*pNor[1]+pDis)/pNor[2];
+        
+        g2o::Vector3D p = v2->estimate() - pPL;
+        _error(0) = p.dot( pl->estimate().normal() );
+    }
+    g2o::Vector3D pInPlane;
 };
 
 } // namespace g2o

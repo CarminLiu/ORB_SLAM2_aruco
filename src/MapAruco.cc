@@ -191,6 +191,12 @@ aruco::Marker MapAruco::GetAruco()
     return mAruco;
 }
 
+MapPlane* MapAruco::GetPlane()
+{
+    unique_lock<mutex> lock(mMutexFeatures);
+    return mPlane;
+}
+
 int MapAruco::Observations()
 {
     unique_lock<mutex> lock(mMutexFeatures);

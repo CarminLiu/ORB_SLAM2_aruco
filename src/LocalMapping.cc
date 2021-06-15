@@ -74,6 +74,7 @@ void LocalMapping::Run()
 
             // Triangulate new MapPoints
             CreateNewMapPoints();
+            MapPointRelatedAruco();
 
             //* Create MapPoints about aurco
             // CreateArucoMapPoints();
@@ -461,6 +462,24 @@ void LocalMapping::CreateNewMapPoints()
             mlpRecentAddedMapPoints.push_back(pMP);
 
             nnew++;
+        }
+    }
+}
+
+void LocalMapping::MapPointRelatedAruco()
+{
+    for(size_t i=0; i<mpCurrentKeyFrame->NA; i++)
+    {
+        vector<size_t> vindices = mpCurrentKeyFrame->GetFeaturesInAruco(i);
+        for(size_t j=0; j<vindices.size(); j++)
+        {
+            MapPoint* pMP = mpCurrentKeyFrame->GetMapPoint(vindices[j]);
+            if(pMP) {
+                if(!pMP->isBad()) {
+                    pMP->forflag = 1;
+                    pMP->mArucoID = mpCurrentKeyFrame->mvMarkers[i].id;
+                }
+            }
         }
     }
 }

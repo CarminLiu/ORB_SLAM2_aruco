@@ -161,4 +161,22 @@ std::vector<float> Converter::toQuaternion(const cv::Mat &M)
     return v;
 }
 
+g2o::Plane3D Converter::toPlane3D(const Eigen::Vector4d &coe) {
+    Eigen::Matrix<double,4,1,Eigen::ColMajor> V;
+    V << coe[0],coe[1],coe[2],coe[3];
+    if(coe[3] < 0.0)
+        V = -V;
+    return g2o::Plane3D(V);
+}
+
+Eigen::Vector4d Converter::toVector4d(const g2o::Plane3D &plane) {
+    Eigen::Matrix<double,4,1,Eigen::ColMajor> V;
+    V = plane.toVector();
+    Eigen::Vector4d vec4d;
+    for(int i=0;i<4;i++)
+        vec4d[i] = V(i,0);
+    return vec4d;
+}
+
+
 } //namespace ORB_SLAM

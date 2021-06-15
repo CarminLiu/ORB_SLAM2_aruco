@@ -36,6 +36,9 @@ public:
     Eigen::Vector3d GetNormal();
     Eigen::Vector3d GetOnePoint();
     double          GetDis();
+    int             GetID();
+    Eigen::Vector4d GetCoeffs();
+    void            SetCoeffs(const Eigen::Vector4d &coe);
 
 protected:
     Eigen::Vector4d mCoeffs;
