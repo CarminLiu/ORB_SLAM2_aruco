@@ -787,6 +787,7 @@ void Tracking::CreateInitialMapMonocular()
                     pMPL->AddMapAruco(pNewMA);
                     pNewMA->AddMapPlane(pMPL);
                     IsInsert = true;
+                    break;
                 }
             }
             
@@ -1578,6 +1579,7 @@ void Tracking::CreateNewKeyFrame()
                             pMPL->AddMapAruco(pNewMA);
                             pNewMA->AddMapPlane(pMPL);
                             IsInsert = true;
+                            break;
                         }
                     }
                     

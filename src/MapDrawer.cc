@@ -61,20 +61,20 @@ void MapDrawer::DrawMapPoints(std::map<int, vector<cv::Point3f>> mmAruMPs)
         if(vpMPs[i]->isBad() || spRefMPs.count(vpMPs[i]))
             continue;
         cv::Mat pos = vpMPs[i]->GetWorldPos();
-        if(vpMPs[i]->forflag == 1) {
-            glPointSize(mPointSize*2);
-            glBegin(GL_POINTS);
-            glColor3f(0.0, 1.0, 0.0);
-            glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
-            glEnd();
-        }
-        else{
+        // if(vpMPs[i]->forflag == 1) {
+        //     glPointSize(mPointSize*2);
+        //     glBegin(GL_POINTS);
+        //     glColor3f(0.0, 1.0, 0.0);
+        //     glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
+        //     glEnd();
+        // }
+        // else{
             glPointSize(mPointSize);
             glBegin(GL_POINTS);
             glColor3f(0.0,0.0,0.0);
             glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
             glEnd();
-        }
+        // }
         // glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
     }
     // glEnd();
@@ -84,19 +84,19 @@ void MapDrawer::DrawMapPoints(std::map<int, vector<cv::Point3f>> mmAruMPs)
         if((*sit)->isBad())
             continue;
         cv::Mat pos = (*sit)->GetWorldPos();
-        if((*sit)->forflag == 1) {
-            glPointSize(mPointSize*2);
-            glBegin(GL_POINTS);
-            glColor3f(0.0, 1.0, 0.0);
-            glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
-            glEnd();
-        } else {
+        // if((*sit)->forflag == 1) {
+        //     glPointSize(mPointSize*2);
+        //     glBegin(GL_POINTS);
+        //     glColor3f(0.0, 1.0, 0.0);
+        //     glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
+        //     glEnd();
+        // } else {
             glPointSize(mPointSize);
             glBegin(GL_POINTS);
             glColor3f(1.0,0.0,0.0);
             glVertex3f(pos.at<float>(0),pos.at<float>(1),pos.at<float>(2));
             glEnd();
-        }
+        // }
         
     }
     
@@ -118,21 +118,37 @@ void MapDrawer::DrawMapPoints(std::map<int, vector<cv::Point3f>> mmAruMPs)
 void MapDrawer::DrawAruco()
 {
     const vector<MapAruco*> &vpMAs = mpMap->GetAllMapArucos();
-    
+    // cout<<"Draw Aruco"<<endl;
     for(size_t i=0; i<vpMAs.size(); i++)
     {
         if(vpMAs[i])
         {
+            int plId = vpMAs[i]->GetPlane()->GetID();
             
+            cv::Vec3b v3 = GetColor(plId); 
             glLineWidth(mKeyFrameLineWidth);
-            glColor3f(0.0f,0.5f,0.5f);
-            glBegin(GL_LINES);
+            float a =(float)v3(0)/255;
+            float b =(float)v3(1)/255;
+            float c =(float)v3(2)/255;
+
+            glColor3f(a,b,c);
+            glBegin(GL_POLYGON);
 
             cv::Mat m0 = vpMAs[i]->GetPosInWorld(0);
             cv::Mat m1 = vpMAs[i]->GetPosInWorld(1);
             cv::Mat m2 = vpMAs[i]->GetPosInWorld(2);
             cv::Mat m3 = vpMAs[i]->GetPosInWorld(3);
 
+            glVertex3f(m0.at<float>(0),m0.at<float>(1),m0.at<float>(2));
+            glVertex3f(m1.at<float>(0),m1.at<float>(1),m1.at<float>(2));
+            glVertex3f(m2.at<float>(0),m2.at<float>(1),m2.at<float>(2));
+            glVertex3f(m3.at<float>(0),m3.at<float>(1),m3.at<float>(2));
+        
+
+            glEnd();
+
+            glColor3f(0.0f, 0.5f, 0.0f);
+            glBegin(GL_LINES);
             glVertex3f(m0.at<float>(0),m0.at<float>(1),m0.at<float>(2));
             glVertex3f(m1.at<float>(0),m1.at<float>(1),m1.at<float>(2));
 
@@ -144,7 +160,6 @@ void MapDrawer::DrawAruco()
         
             glVertex3f(m3.at<float>(0),m3.at<float>(1),m3.at<float>(2));
             glVertex3f(m0.at<float>(0),m0.at<float>(1),m0.at<float>(2));
-
             glEnd();
         }
         
@@ -331,6 +346,118 @@ void MapDrawer::GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M)
     }
     else
         M.SetIdentity();
+}
+
+cv::Vec3b MapDrawer::GetColor(int i)
+{
+    int tmp = i%49;
+    switch (tmp)
+    {
+    case 0:
+        return cv::Vec3b(0,255,255);
+    case 1:
+        return cv::Vec3b(0,0,255);  // red
+    case 2:
+        return cv::Vec3b(255,0,0);  // blue
+    case 3:
+        return cv::Vec3b(255,255,0); // cyan
+    case 4:
+        return cv::Vec3b(47,255,173); // green yellow
+    case 5:
+        return cv::Vec3b(128, 0, 128);
+    case 6:
+        return cv::Vec3b(203,192,255);
+    case 7:
+        return cv::Vec3b(196,228,255);
+    case 8:
+        return cv::Vec3b(42,42,165);
+    // case 9:
+    //     return cv::Vec3b(255,255,255);
+    // case 10:
+    //     return cv::Vec3b(245,245,245); // whitesmoke
+    case 11:
+        return cv::Vec3b(0,165,255); // orange
+    case 12:
+        return cv::Vec3b(230,216,173); // lightblue   
+    case 13:
+        return cv::Vec3b(128,128,128); // grey  
+    case 14:
+        return cv::Vec3b(0,215,255); // gold 
+    case 15:
+        return cv::Vec3b(30,105,210); // chocolate
+    case 16:
+        return cv::Vec3b(0,255,0);  // green
+    case 17:
+        return cv::Vec3b(34, 34, 178);  // firebrick
+    case 18:
+        return cv::Vec3b(240, 255, 240);  // honeydew
+    case 19:
+        return cv::Vec3b(250, 206, 135);  // lightskyblue
+    case 20:
+        return cv::Vec3b(238, 104, 123);  // mediumslateblue
+    case 21:
+        return cv::Vec3b(225, 228, 255);  // mistyrose
+    case 22:
+        return cv::Vec3b(128, 0, 0);  // navy
+    case 23:
+        return cv::Vec3b(35, 142, 107);  // olivedrab
+    case 24:
+        return cv::Vec3b(45, 82, 160);  // sienna
+    case 25:
+        return cv::Vec3b(0, 255, 127); // chartreuse
+    case 26:
+        return cv::Vec3b(139, 0, 0);  // darkblue
+    case 27:
+        return cv::Vec3b(60, 20, 220);  // crimson
+    case 28:
+        return cv::Vec3b(0, 0, 139);  // darkred
+    case 29:
+        return cv::Vec3b(211, 0, 148);  // darkviolet
+    case 30:
+        return cv::Vec3b(255, 144, 30);  // dodgerblue
+    case 31:
+        return cv::Vec3b(105, 105, 105);  // dimgray
+    case 32:
+        return cv::Vec3b(180, 105, 255);  // hotpink
+    case 33:
+        return cv::Vec3b(204, 209, 72);  // mediumturquoise
+    case 34:
+        return cv::Vec3b(173, 222, 255);  // navajowhite
+    case 35:
+        return cv::Vec3b(143, 143, 188); // rosybrown
+    case 36:
+        return cv::Vec3b(50, 205, 50);  // limegreen
+    case 37:
+        return cv::Vec3b(34, 34, 178);  // firebrick
+    case 38:
+        return cv::Vec3b(240, 255, 240);  // honeydew
+    case 39:
+        return cv::Vec3b(250, 206, 135);  // lightskyblue
+    case 40:
+        return cv::Vec3b(238, 104, 123);  // mediumslateblue
+    case 41:
+        return cv::Vec3b(225, 228, 255);  // mistyrose
+    case 42:
+        return cv::Vec3b(128, 0, 0);  // navy
+    case 43:
+        return cv::Vec3b(35, 142, 107);  // olivedrab
+    case 44:
+        return cv::Vec3b(45, 82, 160);  // sienna
+    case 45:
+        return cv::Vec3b(30,105,210); // chocolate
+    case 46:
+        return cv::Vec3b(0,255,0);  // green
+    case 47:
+        return cv::Vec3b(34, 34, 178);  // firebrick
+    case 48:
+        return cv::Vec3b(240, 255, 240);  // honeydew
+    
+    case 9:
+        return cv::Vec3b(250, 206, 135);  // lightskyblue
+    
+    case 10:
+        return cv::Vec3b(238, 104, 123);  // mediumslateblue    
+    }
 }
 
 } //namespace ORB_SLAM

@@ -41,30 +41,31 @@ bool EdgeMarker::write(std::ostream& os) const
 //     VertexSE3Expmap * vi = static_cast<VertexSE3Expmap *>(_vertices[0]);
 //     SE3Quat Tc2g(vj->estimate());
 //     SE3Quat Tg2m(vi->estimate());
-//     g2o::Vector3D points2[4];
-//     auto Tc2m = Tc2g * Tg2m;
-//     for(int i=0; i<4; i++)
-//     {
-//         points2[i]=Tc2m.map(points[i]);
-//     }
-//     Eigen::Matrix<double, 3, 6> pm0;
-//     pm0<< 0, -points2[0](2), points2[0](1), -1, 0, 0,
-//           points2[0](2), 0, -points2[0](0), 0, -1, 0,
-//           -points2[0](1), points2[0](0), 0, 0, 0, -1;
-//     Eigen::Matrix<double, 3, 6> pm1;
-//     pm1<< 0, -points2[1](2), points2[1](1), -1, 0, 0,
-//           points2[1](2), 0, -points2[1](0), 0, -1, 0,
-//           -points2[1](1), points2[1](0), 0, 0, 0, -1;
-//     Eigen::Matrix<double, 3, 6> pm2;
-//     pm2<< 0, -points2[2](2), points2[2](1), -1, 0, 0,
-//           points2[2](2), 0, -points2[2](0), 0, -1, 0,
-//           -points2[2](1), points2[2](0), 0, 0, 0, -1;
-//     Eigen::Matrix<double, 3, 6> pm3;
-//     pm3<< 0, -points2[3](2), points2[3](1), -1, 0, 0,
-//           points2[3](2), 0, -points2[3](0), 0, -1, 0,
-//           -points2[3](1), points2[3](0), 0, 0, 0, -1;
 
-//     double x0=points2[0](0), y0=points2[0](1), z0=points2[0](2);
+//     auto Tc2m = Tc2g * Tg2m;
+//     g2o::Vector3D p_c2m = Tc2m.map(point);
+// //     for(int i=0; i<4; i++)
+// //     {
+// //         points2[i]=Tc2m.map(points[i]);
+// //     }
+//     Eigen::Matrix<double, 3, 6> pm0;
+//     pm0<< 0,         -p_c2m(2), p_c2m(1), -1, 0, 0,
+//           p_c2m(2),  0,        -p_c2m(0), 0, -1, 0,
+//           -p_c2m(1), p_c2m(0),  0,        0, 0, -1;
+// //     Eigen::Matrix<double, 3, 6> pm1;
+// //     pm1<< 0, -points2[1](2), points2[1](1), -1, 0, 0,
+// //           points2[1](2), 0, -points2[1](0), 0, -1, 0,
+// //           -points2[1](1), points2[1](0), 0, 0, 0, -1;
+// //     Eigen::Matrix<double, 3, 6> pm2;
+// //     pm2<< 0, -points2[2](2), points2[2](1), -1, 0, 0,
+// //           points2[2](2), 0, -points2[2](0), 0, -1, 0,
+// //           -points2[2](1), points2[2](0), 0, 0, 0, -1;
+// //     Eigen::Matrix<double, 3, 6> pm3;
+// //     pm3<< 0, -points2[3](2), points2[3](1), -1, 0, 0,
+// //           points2[3](2), 0, -points2[3](0), 0, -1, 0,
+// //           -points2[3](1), points2[3](0), 0, 0, 0, -1;
+
+//     double x0=p_c2m(0), y0=p_c2m(1), z0=p_c2m(2);
 //     double z0_2=z0*z0;
 //     Eigen::Matrix<double,2,3> tmp0;
 //     tmp0(0,0) = fx;
@@ -73,7 +74,7 @@ bool EdgeMarker::write(std::ostream& os) const
 //     tmp0(1,0) = 0;
 //     tmp0(1,1) = fy;
 //     tmp0(1,2) = -y0/z0*fy;
-//     _jacobianOplusXi.block(0,0,2,6) = -1./z0 * tmp0 * Tc2g.rotation().toRotationMatrix()*pm0;
+//     _jacobianOplusXi= -1./z0 * tmp0 * Tc2g.rotation().toRotationMatrix()*pm0;
 //     // 0
 //     _jacobianOplusXj(0,0) =  x0*y0/z0_2 *fx;
 //     _jacobianOplusXj(0,1) = -(1+(x0*x0/z0_2)) *fx;
@@ -87,7 +88,7 @@ bool EdgeMarker::write(std::ostream& os) const
 //     _jacobianOplusXj(1,3) = 0;
 //     _jacobianOplusXj(1,4) = -1./z0 *fy;
 //     _jacobianOplusXj(1,5) = y0/z0_2 *fy;
-//     // 1
+// //     // 1
 //     double x1=points2[1](0), y1=points2[1](1), z1=points2[1](2);
 //     double z1_2=z1*z1;
 //     Eigen::Matrix<double,2,3> tmp1;
