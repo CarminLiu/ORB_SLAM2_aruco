@@ -153,10 +153,10 @@ cv::Mat FrameDrawer::DrawFrame()
             pt2.y = vCurrentArucos[i][2].y;
             pt3.x = vCurrentArucos[i][3].x;
             pt3.y = vCurrentArucos[i][3].y;
-            cv::line(im,pt0,pt1,cv::Scalar(255,0,0));
-            cv::line(im,pt1,pt2,cv::Scalar(255,0,0));
-            cv::line(im,pt2,pt3,cv::Scalar(255,0,0));
-            cv::line(im,pt3,pt0,cv::Scalar(255,0,0));
+            cv::line(im,pt0,pt1,cv::Scalar(255,0,0),2);
+            cv::line(im,pt1,pt2,cv::Scalar(255,0,0),2);
+            cv::line(im,pt2,pt3,cv::Scalar(255,0,0),2);
+            cv::line(im,pt3,pt0,cv::Scalar(255,0,0),2);
             
     }
         

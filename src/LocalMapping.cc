@@ -75,6 +75,8 @@ void LocalMapping::Run()
             // Triangulate new MapPoints
             CreateNewMapPoints();
             MapPointRelatedAruco();
+            ProcessPlane();
+            MergePlane();
 
             //* Create MapPoints about aurco
             // CreateArucoMapPoints();
@@ -479,6 +481,95 @@ void LocalMapping::MapPointRelatedAruco()
                     pMP->forflag = 1;
                     pMP->mArucoID = mpCurrentKeyFrame->mvMarkers[i].id;
                 }
+            }
+        }
+    }
+}
+
+void LocalMapping::ProcessPlane()
+{
+    vector<MapPlane*> vpMPL = mpCurrentKeyFrame->GetAllMapPlanes();
+    for(int i=0; i<vpMPL.size(); i++)
+    {
+        MapPlane* pMPL = vpMPL[i];
+        int numMA = pMPL->GetMapArucoNums();
+        if(numMA == 1)
+        {
+            vector<MapAruco*> vpMA = pMPL->GetMapAruco();
+            // MapAruco* MA0 = vpMA[0];
+            double d = pMPL->GetMapArucoDis(0);
+            // cout<<"Only one MapAruco, and distance is = "<<d<<endl;
+            cv::Mat MATwm = vpMA[0]->GetTwm();
+            pMPL->SetCoeffsByAruco(MATwm);
+        }
+    }
+}
+
+void LocalMapping::MergePlane()
+{
+    // find relation between planes, include parallel and vertical
+    vector<MapPlane*> vpMPL = mpCurrentKeyFrame->GetAllMapPlanes();
+    for(size_t i=0; i<vpMPL.size(); i++)
+    {
+        MapPlane* pi = vpMPL[i];
+        Eigen::Vector3d ni = pi->GetNormal();
+        for(size_t j=0; j<vpMPL.size(); j++)
+        {
+            if(i==j) continue;
+            MapPlane* pj = vpMPL[j];
+            Eigen::Vector3d nj = pj->GetNormal();
+            double ijdot = abs(ni.dot(nj));
+            if(ijdot < cos(75*M_PI/180)) //vertical
+            {
+                pi->SetVerPlanes(pj);
+                vector<MapAruco*> vpMAj = pj->GetMapAruco();
+                for(size_t jk=0; jk<vpMAj.size(); jk++)
+                {
+                    pi->SetVerArucos(vpMAj[jk]);
+                }
+            }
+            else if (ijdot > cos(15*M_PI/180)) //parallel
+            {
+                pi->SetParPlanes(pj);
+                vector<MapAruco*> vpMAj = pj->GetMapAruco();
+                for(size_t jk=0; jk<vpMAj.size(); jk++)
+                {
+                    pi->SetParArucos(vpMAj[jk]);
+                }
+            }
+        }
+    }
+
+    // Merge the same plane
+    // which has parallel relation
+    for(size_t i=0; i<vpMPL.size(); i++)
+    {
+        MapPlane* pi = vpMPL[i];
+        Eigen::Vector3d ni = pi->GetNormal();
+        vector<MapPlane*> piPar = pi->GetParPlanes();
+        Eigen::Vector3d iPoint = pi->GetOnePoint();
+        for(size_t j=0; j<piPar.size(); j++)
+        {
+            MapPlane* pj = piPar[i];
+            vector<MapAruco*> pjA = pj->GetMapAruco();
+            int nFuse = 0;
+            for(size_t ja=0; ja<pjA.size(); ja++)
+            {
+                MapAruco* pMA = pjA[ja];
+                cv::Mat tw = pMA->Gettw2m();
+                Eigen::Vector3d pointM(tw.at<float>(0,0),tw.at<float>(1,0),tw.at<float>(2,0));
+                Eigen::Vector3d pP2M = pointM - iPoint;
+                double d = abs(pP2M.dot(ni));
+                if(d<0.1) // 代表距离i平面很近
+                {
+                    nFuse++;
+                }
+            }
+            if(nFuse>0.66*piPar.size())//Merge plane_j to plane_i
+            {
+                // pj --> delete
+                // pj --> set bad
+                // pi --> erase parplane, pararuco
             }
         }
     }

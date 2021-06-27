@@ -39,6 +39,19 @@ public:
     int             GetID();
     Eigen::Vector4d GetCoeffs();
     void            SetCoeffs(const Eigen::Vector4d &coe);
+    void            SetCoeffsByAruco(const cv::Mat& Twm);
+    int             GetMapArucoNums();
+    vector<MapAruco*> GetMapAruco();
+    double          GetMapArucoDis(const size_t& idx);
+
+    void            SetParPlanes(MapPlane* pMPL);
+    void            SetVerPlanes(MapPlane* pMPL);
+    void            SetParArucos(MapAruco* pMA);
+    void            SetVerArucos(MapAruco* pMA);
+    vector<MapPlane*> GetParPlanes();
+    
+    bool  isBad();
+    void  SetBadFlag();
 
 protected:
     Eigen::Vector4d mCoeffs;
@@ -50,6 +63,12 @@ protected:
     int mID;
 
     Map* mpMap;
+    bool mbBad;
+
+    set<MapPlane*> mspParPlanes;
+    set<MapPlane*> mspVerPlanes;
+    set<MapAruco*> mspParArucos;
+    set<MapAruco*> mspVerArucos;
 
     std::set<MapAruco*> mspMapArucos;
 

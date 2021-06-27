@@ -171,12 +171,12 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     cout<<"Set MapAruco vertices"<<endl;
     int nMonoEdge = nnedges;
     int wei = 0;
-    if(vpMA.size()>0){
-        wei = nMonoEdge/vpMA.size();
-        wei /= 4;
-        if(wei>50) wei=50;
-    }
-    wei = 3;
+    // if(vpMA.size()>0){
+    //     wei = nMonoEdge/vpMA.size();
+    //     wei /= 4;
+    //     if(wei>50) wei=50;
+    // }
+    wei = 7;
     // wei *= 0.8;
     for(size_t i=0; i<vpMA.size(); i++)
     {
@@ -213,7 +213,7 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
                 Eigen::Matrix<double,2,1> obs;
                 obs<<pKFi->mvArucoUn[4*idx+k].x, pKFi->mvArucoUn[4*idx+k].y;
                 e->setMeasurement(obs);
-                e->setInformation(Eigen::Matrix2d::Identity()*3);
+                e->setInformation(Eigen::Matrix2d::Identity()*wei);
                 auto p = pMA->get3DPointsLocalRefSystem(k);
                 
                 g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
@@ -235,9 +235,10 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
     } //if(Frame::mbUArucoIni)
 
     // Optimize!
-    cout<<"before optimize"<<endl;
+    // cout<<"before optimize"<<endl;
     optimizer.initializeOptimization();
     optimizer.optimize(nIterations);
+    // cout<<"after optimize"<<endl;
 
     // Recover optimized data
 
@@ -615,13 +616,13 @@ int Optimizer::PoseOptimizationByAruco(Frame *pFrame)
     if(Frame::mbUArucoIni){
     int nMonoEdge = vpEdgesMono.size();
     int wei = 0;
-    if(pFrame->NA > 0){
-        wei = nMonoEdge/pFrame->NA;
-        wei /= 4;
-        if(wei>50) wei=50;
-    }
+    // if(pFrame->NA > 0){
+    //     wei = nMonoEdge/pFrame->NA;
+    //     wei /= 4;
+    //     if(wei>50) wei=50;
+    // }
     // wei *= 0.8;
-    wei = 3;
+    wei = 7;
     // cout<<"pose optimization wei = "<<wei<<endl;
          
     {
@@ -658,7 +659,7 @@ int Optimizer::PoseOptimizationByAruco(Frame *pFrame)
                     Eigen::Matrix<double,2,1> obs;
                     obs<<pFrame->mvArucoUn[4*i+k].x, pFrame->mvArucoUn[4*i+k].y;
                     e->setMeasurement(obs);
-                    e->setInformation(Eigen::Matrix2d::Identity()*3);
+                    e->setInformation(Eigen::Matrix2d::Identity()*wei);
                     auto p = pMA->get3DPointsLocalRefSystem(k);
                     
                     g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
@@ -1018,39 +1019,39 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
 
     // cout << "vpEdgesMono.size = " << vpEdgesMono.size();
     // if(Frame::mbUArucoIni){
-    // int cnt_aruco_edge = 0;
-    // for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(), vend=vLocalMapArucosMono.end(); vit!=vend; vit++)
-    // {
-    //     MapAruco* pMA = *vit;
-    //     // if(pMA)
-    //     const map<KeyFrame*, size_t> mapObs = pMA->GetObservations();
-    //     for(map<KeyFrame*, size_t>::const_iterator mit=mapObs.begin(), mend=mapObs.end(); mit!=mend; mit++)
-    //     {
-    //         KeyFrame* pKFi = mit->first;
-    //         if(pKFi->isBad())
-    //             continue;
-    //         int pKFiId = pKFi->mnId;
-    //         vector<int>::iterator iitId = find(viSaveKFid.begin(), viSaveKFid.end(), pKFiId);
+    int cnt_aruco_edge = 0;
+    for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(), vend=vLocalMapArucosMono.end(); vit!=vend; vit++)
+    {
+        MapAruco* pMA = *vit;
+        // if(pMA)
+        const map<KeyFrame*, size_t> mapObs = pMA->GetObservations();
+        for(map<KeyFrame*, size_t>::const_iterator mit=mapObs.begin(), mend=mapObs.end(); mit!=mend; mit++)
+        {
+            KeyFrame* pKFi = mit->first;
+            if(pKFi->isBad())
+                continue;
+            int pKFiId = pKFi->mnId;
+            vector<int>::iterator iitId = find(viSaveKFid.begin(), viSaveKFid.end(), pKFiId);
             
-    //         // 判断该关键帧是否在要优化的帧内，避免相关的帧没有相关的优化节点。
-    //         //* 优化方向：考虑将与当前帧可视的Aruco的相关的帧全部加入
-    //         if(iitId == viSaveKFid.end()) 
-    //             continue;
+            // 判断该关键帧是否在要优化的帧内，避免相关的帧没有相关的优化节点。
+            //* 优化方向：考虑将与当前帧可视的Aruco的相关的帧全部加入
+            if(iitId == viSaveKFid.end()) 
+                continue;
             
-    //         cnt_aruco_edge++;
-    //     }
+            cnt_aruco_edge++;
+        }
         
-    // }
-    // // cout<<"\tvLocalMapArucosMono.size = "<<vLocalMapArucosMono.size() << "\tcnt_aruco_edge = "<<cnt_aruco_edge<<endl;
-    // int nMonoEdge = vpEdgesMono.size();
-    // int wei = 0;
-    // if(cnt_aruco_edge > 0){
-    //     wei = nMonoEdge/cnt_aruco_edge;
-    //     wei /= 4;
-    //     if(wei>50) wei=50;
-    // }
-    // // wei *= 0.8;
-    // wei = 3;
+    }
+    // cout<<"\tvLocalMapArucosMono.size = "<<vLocalMapArucosMono.size() << "\tcnt_aruco_edge = "<<cnt_aruco_edge<<endl;
+    int nMonoEdge = vpEdgesMono.size();
+    int wei = 0;
+    if(cnt_aruco_edge > 0){
+        wei = nMonoEdge/cnt_aruco_edge;
+        wei /= 4;
+        if(wei>50) wei=50;
+    }
+    // wei *= 0.8;
+    wei = 7;
 
     unsigned long maxMAid = 0;
     if(Frame::mbUArucoIni){
@@ -1093,7 +1094,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
                 Eigen::Matrix<double,2,1> obs;
                 obs<<pKFi->mvArucoUn[4*idx+k].x, pKFi->mvArucoUn[4*idx+k].y;
                 e->setMeasurement(obs);
-                e->setInformation(Eigen::Matrix2d::Identity()*3);
+                e->setInformation(Eigen::Matrix2d::Identity()*wei);
                 auto p = pMA->get3DPointsLocalRefSystem(k);
                 
                 g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
@@ -1120,7 +1121,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
     // TODO: add MapPlane as vertex and edges
     vector<MapPlane*> vLocalMapPlanes;
     vector<int> viSavePlaneId;
-    // vector<g2o::EdgePlaneMarker*> vpEdgePlaneMarker;
+    vector<g2o::EdgePlaneMarker*> vpEdgePlaneMarker;
     // cout<<"COLLECT PLANES-----------------pMA->GetPlane()"<<endl;
     for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(), vend=vLocalMapArucosMono.end(); vit!=vend; vit++)
     {
@@ -1134,44 +1135,43 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
         }
     }
     // cout<<"ADD PLANE VERTEX----------------------"<<endl;
-    // for(vector<MapPlane*>::iterator vit=vLocalMapPlanes.begin(), vend=vLocalMapPlanes.end(); vit!=vend; vit++)
-    // {
-    //     MapPlane* pMPL = *vit;
-    //     int plid = pMPL->GetID() + maxMAid + 1;
-    //     g2o::VertexPlane *vPL = new g2o::VertexPlane();
-    //     vPL->setId(plid);
-    //     vPL->setEstimate(Converter::toPlane3D(pMPL->GetCoeffs()));
-    //     // vPL->setFixed(false);
-    //     vPL->setMarginalized(true);
-    //     optimizer.addVertex(vPL);
-    // }
+    for(vector<MapPlane*>::iterator vit=vLocalMapPlanes.begin(), vend=vLocalMapPlanes.end(); vit!=vend; vit++)
+    {
+        MapPlane* pMPL = *vit;
+        int plid = pMPL->GetID() + maxMAid + 1;
+        g2o::VertexPlane *vPL = new g2o::VertexPlane();
+        vPL->setId(plid);
+        vPL->setEstimate(Converter::toPlane3D(pMPL->GetCoeffs()));
+        // vPL->setFixed(false);
+        vPL->setMarginalized(true);
+        optimizer.addVertex(vPL);
+    }
     // cout<<"ADD PLANE EDGE WITH MARKER----------------------"<<endl;
-    // for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(), vend=vLocalMapArucosMono.end(); vit!=vend; vit++)
-    // {
-    //     MapAruco* pMA = *vit;
-    //     int aid = pMA->GetMapArucoID()+1+maxMPid;
-    //     MapPlane* pMPL = pMA->GetPlane();
-    //     int plid = pMPL->GetID() + maxMAid + 1;
-    //     for(size_t k=0; k<4; k++)
-    //     {
-    //         g2o::EdgePlaneMarker *e = new g2o::EdgePlaneMarker();
-    //         e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(aid)));
-    //         e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(plid)));
-    //         e->setInformation(Eigen::Matrix<double,1,1>::Identity()*0.01);
-    //         auto p = pMA->get3DPointsLocalRefSystem(k);
-    //         e->point = g2o::Vector3D(p.x, p.y, p.z);
-    //         Eigen::Vector3d pinpl = pMPL->GetOnePoint();
-    //         e->pInPlane = g2o::Vector3D(pinpl[0], pinpl[1], pinpl[2]);
+    for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(), vend=vLocalMapArucosMono.end(); vit!=vend; vit++)
+    {
+        MapAruco* pMA = *vit;
+        int aid = pMA->GetMapArucoID()+1+maxMPid;
+        MapPlane* pMPL = pMA->GetPlane();
+        int plid = pMPL->GetID() + maxMAid + 1;
+        
+        g2o::EdgePlaneMarker *e = new g2o::EdgePlaneMarker();
+        e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(aid)));
+        e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(plid)));
+        e->setInformation(Eigen::Matrix<double,3,3>::Identity());
+        // auto p = pMA->get3DPointsLocalRefSystem(k);
+        // e->point = g2o::Vector3D(p.x, p.y, p.z);
+        // Eigen::Vector3d pinpl = pMPL->GetOnePoint();
+        // e->pInPlane = g2o::Vector3D(pinpl[0], pinpl[1], pinpl[2]);
 
-    //         g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
-    //         e->setRobustKernel(rk);
-    //         rk->setDelta(100);
+        g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
+        e->setRobustKernel(rk);
+        rk->setDelta(10);
 
-    //         optimizer.addEdge(e);
-    //         vpEdgePlaneMarker.push_back(e);
-    //     }
+        optimizer.addEdge(e);
+        vpEdgePlaneMarker.push_back(e);
+        
 
-    // }
+    }
     // vector<g2o::EdgePlanePoint*> vpEdgePlanePoint;
     // for(list<MapPoint*>::iterator lit=lLocalMapPoints.begin(), lend=lLocalMapPoints.end(); lit!=lend; lit++)
     // {
@@ -1189,15 +1189,12 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
 
     //     int id = pMP->mnId+maxKFid+1;
     //     int plid = pMPL->GetID() + maxMAid + 1;
-    //     cout<<id<<"\t"<<plid<<endl;
+    //     // cout<<id<<"\t"<<plid<<endl;
 
     //     g2o::EdgePlanePoint *e = new g2o::EdgePlanePoint();
     //     e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(id)));
     //     e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer.vertex(plid)));
-    //     e->setInformation(Eigen::Matrix<double,1,1>::Identity()*0.005);
-    //     Eigen::Vector3d pinpl = pMPL->GetOnePoint();
-    //     e->pInPlane = g2o::Vector3D(pinpl[0], pinpl[1], pinpl[2]);
-
+    //     e->setInformation(Eigen::Matrix<double,3,3>::Identity());
     //     g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
     //     e->setRobustKernel(rk);
     //     rk->setDelta(10);
@@ -1213,7 +1210,10 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
             return;
 
     optimizer.initializeOptimization();
-    optimizer.optimize(5);
+    // cout<<"before optimizer.optimize(5);"<<endl;
+    int opt5 = optimizer.optimize(5);
+    // cout<<"after optimizer.optimize(5)\t"<<opt5<<endl;
+
     bool bDoMore= true;
 
     if(pbStopFlag)
@@ -1224,7 +1224,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
     {
 
     // Check inlier observations
-    double sumPoints = 0;
+    // double sumPoints = 0;
     for(size_t i=0, iend=vpEdgesMono.size(); i<iend;i++)
     {
         g2o::EdgeSE3ProjectXYZ* e = vpEdgesMono[i];
@@ -1232,7 +1232,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
 
         if(pMP->isBad())
             continue;
-        sumPoints+=e->chi2();
+        // sumPoints+=e->chi2();
         if(e->chi2()>5.991 || !e->isDepthPositive())
         {
             e->setLevel(1);
@@ -1240,7 +1240,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
 
         e->setRobustKernel(0);
     }
-    cout<<"sumPoints = "<<sumPoints<<endl;
+    // cout<<"sumPoints = "<<sumPoints<<endl;
 
     // TODO: check MapAruco inlier observations
     // double sumMarker = 0;
@@ -1253,11 +1253,12 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
             e->setLevel(1);
         e->setRobustKernel(0);
     }
+    // cout<<"sumMarker = "<<sumMarker<<"======================"<<endl;
     
     
     optimizer.initializeOptimization(0);
-    optimizer.optimize(10);
-    // cout<<"optimizer.optimize(10);"<<endl;
+    int opt2 = optimizer.optimize(10);
+    // cout<<"optimizer.optimize(10)\t"<<opt2<<endl;
     }
 
     vector<pair<KeyFrame*,MapPoint*> > vToErase;
@@ -1330,11 +1331,22 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
         pMA->SetRtwm(R, t);
     }
     }
-    cout<< "============END OF LOCAL BA============" <<endl;
+
+    for(vector<MapPlane*>::iterator vit=vLocalMapPlanes.begin(), vend=vLocalMapPlanes.end(); vit!=vend; vit++)
+    {
+        MapPlane* pMPL = *vit;
+        int plid = pMPL->GetID() + maxMAid + 1;
+        g2o::VertexPlane* vpl = static_cast<g2o::VertexPlane*>(optimizer.vertex(plid));
+        g2o::Plane3D gp = vpl->estimate();
+        Eigen::Vector4d ep = Converter::toVector4d(gp);
+        pMPL->SetCoeffs(ep);
+    }
+
+    // cout<< "============END OF LOCAL BA============" <<endl;
 
 
-    g2o::SparseOptimizer optimizer2;
-    optimizer2.setVerbose(true);
+/*    g2o::SparseOptimizer optimizer2;
+    // optimizer2.setVerbose(true);
     g2o::BlockSolver_6_3::LinearSolverType * linearSolver2;
     linearSolver2 = new g2o::LinearSolverEigen<g2o::BlockSolver_6_3::PoseMatrixType>();
     g2o::BlockSolver_6_3 * solver_ptr2 = new g2o::BlockSolver_6_3(linearSolver2);
@@ -1342,6 +1354,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
     optimizer2.setAlgorithm(solver2);
 
     int maxMPLid=0;
+    int itemp=0;
     for(vector<MapPlane*>::iterator vit=vLocalMapPlanes.begin(), vend=vLocalMapPlanes.end(); vit!=vend; vit++)
     {
         MapPlane* pMPL = *vit;
@@ -1351,10 +1364,12 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
         g2o::VertexPlane *vPL = new g2o::VertexPlane();
         vPL->setId(plid);
         vPL->setEstimate(Converter::toPlane3D(pMPL->GetCoeffs()));
-        vPL->setFixed(plid==0);
+        vPL->setFixed(itemp==0);
+        itemp++;
         optimizer2.addVertex(vPL);
     }
     int max2maid=0;
+    itemp=0;
     for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(),vend=vLocalMapArucosMono.end();vit!=vend;vit++)
     {
         MapAruco* pMA = *vit;
@@ -1365,32 +1380,27 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
             max2maid = aid;
         vSE3Aruco->setId(aid);
         // vSE3Aruco->setMarginalized(true); 
-        vSE3Aruco->setFixed(false);    
+        vSE3Aruco->setFixed(itemp==0);    
+        itemp++;
         optimizer2.addVertex(vSE3Aruco);
         
         MapPlane* pMPL = pMA->GetPlane();
         int plid = pMPL->GetID();
-        for(size_t k=0; k<4; k++)
-        {
-            g2o::EdgePlaneMarker *e = new g2o::EdgePlaneMarker();
-            e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer2.vertex(aid)));
-            e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer2.vertex(plid)));
-            e->setInformation(Eigen::Matrix<double,1,1>::Identity()*0.01);
-            auto p = pMA->get3DPointsLocalRefSystem(k);
-            e->point = g2o::Vector3D(p.x, p.y, p.z);
-            Eigen::Vector3d pinpl = pMPL->GetOnePoint();
-            e->pInPlane = g2o::Vector3D(pinpl[0], pinpl[1], pinpl[2]);
+        
+        g2o::EdgePlaneMarker *e = new g2o::EdgePlaneMarker();
+        e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer2.vertex(aid)));
+        e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer2.vertex(plid)));
+        e->setInformation(Eigen::Matrix<double,3,3>::Identity());
 
-            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
-            e->setRobustKernel(rk);
-            rk->setDelta(100);
+        g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
+        e->setRobustKernel(rk);
+        rk->setDelta(10);
 
-            optimizer2.addEdge(e);
-            // vpEdgePlaneMarker.push_back(e);
-        }
-
+        optimizer2.addEdge(e);
+        // vpEdgePlaneMarker.push_back(e);
         
     }
+
     vector<MapPoint*> vmpSave;
     for(list<MapPoint*>::iterator lit=lLocalMapPoints.begin(), lend=lLocalMapPoints.end(); lit!=lend; lit++)
     {
@@ -1419,9 +1429,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
         g2o::EdgePlanePoint *e = new g2o::EdgePlanePoint();
         e->setVertex(1, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer2.vertex(id)));
         e->setVertex(0, dynamic_cast<g2o::OptimizableGraph::Vertex*>(optimizer2.vertex(pMPL->GetID())));
-        e->setInformation(Eigen::Matrix<double,1,1>::Identity()*0.005);
-        Eigen::Vector3d pinpl = pMPL->GetOnePoint();
-        e->pInPlane = g2o::Vector3D(pinpl[0], pinpl[1], pinpl[2]);
+        e->setInformation(Eigen::Matrix<double,3,3>::Identity());
 
         g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
         e->setRobustKernel(rk);
@@ -1434,8 +1442,8 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
 
     optimizer2.initializeOptimization();
     cout<<"1"<<endl;
-    optimizer2.optimize(5);
-    cout<<"22"<<endl;
+   int t = optimizer2.optimize(5);
+    cout<<"22\t"<<t<<endl;
     
     for(vector<MapAruco*>::iterator vit=vLocalMapArucosMono.begin(), vend=vLocalMapArucosMono.end(); vit!=vend; vit++)
     {
@@ -1466,7 +1474,7 @@ void Optimizer::LocalBundleAdjustment(KeyFrame *pKF, bool* pbStopFlag, Map* pMap
         g2o::VertexSBAPointXYZ* vPoint = static_cast<g2o::VertexSBAPointXYZ*>(optimizer2.vertex(pMP->mnId+max2maid+1));
         pMP->SetWorldPos(Converter::toCvMat(vPoint->estimate()));
         pMP->UpdateNormalAndDepth();
-    }
+    }*/
     
 }
 
