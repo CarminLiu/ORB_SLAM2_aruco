@@ -6,9 +6,9 @@ I add fiducial marker--Aruco to deal with scale problem, scale drift, and tracki
 
 I learn a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), and modified the code from my personal understanding.
 
-<img src="map1.png" alt="map1" style="zoom:33%;" />
+<img src="map1.png" alt="map1" style="zoom:20%;" />
 
-<img src="large-scene2.png" alt="large-scene2" style="zoom:33%;" />
+<img src="large-scene2.png" alt="large-scene2" style="zoom:20%;" />
 
 
 
