@@ -24,7 +24,7 @@
 namespace g2o
 {
 
-class EdgePlaneMarker: public g2o::BaseBinaryEdge<3, Plane3D, VertexPlane, VertexSE3Expmap>
+class EdgePlaneMarker: public g2o::BaseBinaryEdge<1, double, VertexPlane, VertexSE3Expmap>
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -41,23 +41,28 @@ public:
         //plane
         const VertexPlane* pl = static_cast<const VertexPlane*>(_vertices[0]);
         //marker
-        const VertexSE3Expmap* Tg2m = static_cast<const VertexSE3Expmap*>(_vertices[1]);
+        const VertexSE3Expmap* g2m = static_cast<const VertexSE3Expmap*>(_vertices[1]);
 
-        Plane3D plane = pl->estimate();
-        Eigen::Matrix3d mR = Tg2m->estimate().rotation().toRotationMatrix();
-        Eigen::Vector3d mt = Tg2m->estimate().translation();
-        Vector3D mNormal(mR(0,2), mR(1,2), mR(2,2));
-        double dis = mNormal.dot(mt);
-        Plane3D MarkerPlane(Vector4D(mR(0,2), mR(1,2), mR(2,2),-dis));
-        _error = plane.ominus(MarkerPlane);
+        point = g2m->estimate().map(point);
+        // pl->estimate().coeffs();
+        g2o::Vector3D pNor = pl->estimate().normal();
+        double pDis = pl->estimate().distance();
+        g2o::Vector3D pPL;
+        pPL[0] = pInPlane[0];
+        pPL[1] = pInPlane[1];
+        pPL[2] = -(pPL[0]*pNor[0]+pPL[1]*pNor[1]-pDis)/pNor[2];
+
+        g2o::Vector3D p = point - pPL;
+        
+        _error(0) = p.dot( pl->estimate().normal() ); 
     }
 
-    // g2o::Vector3D point;
-    // g2o::Vector3D pInPlane;
+    g2o::Vector3D point;
+    g2o::Vector3D pInPlane;
 
 };
 
-class EdgePlanePoint: public g2o::BaseBinaryEdge<3, Vector3D, VertexPlane, VertexSBAPointXYZ>
+class EdgePlanePoint: public g2o::BaseBinaryEdge<1, double, VertexPlane, VertexSBAPointXYZ>
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -72,35 +77,18 @@ public:
         const VertexPlane* pl = static_cast<const VertexPlane*>(_vertices[0]);
         const VertexSBAPointXYZ* v2 = static_cast<const VertexSBAPointXYZ*>(_vertices[1]);
         
-        g2o::Vector3D point = v2->estimate();
         g2o::Vector3D pNor = pl->estimate().normal();
         double pDis = pl->estimate().distance();
-        double t = pNor.dot(point) - pDis;
-        pInPlane[0] = point[0] - pNor[0]*t;
-        pInPlane[1] = point[1] - pNor[1]*t;
-        pInPlane[2] = point[2] - pNor[2]*t;
+        g2o::Vector3D pPL;
+        pPL[0] = pInPlane[0];
+        pPL[1] = pInPlane[1];
+        pPL[2] = -(pPL[0]*pNor[0]+pPL[1]*pNor[1]+pDis)/pNor[2];
         
-        _error = point - pInPlane;
+        g2o::Vector3D p = v2->estimate() - pPL;
+        _error(0) = p.dot( pl->estimate().normal() );
     }
     g2o::Vector3D pInPlane;
 };
-
-// class EdgePlaneParallel: public g2o::BaseBinaryEdge<2, Plane3D, VertexPlane, VertexPlane>
-// {
-// public:
-//     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
-//     EdgePlaneParallel(){}
-
-//     virtual bool read(std::istream& is);
-
-//     virtual bool write(std::ostream& os) const;
-
-//     void computeError() {
-
-//     }
-
-// };
 
 } // namespace g2o
 

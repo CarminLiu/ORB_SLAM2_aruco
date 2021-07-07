@@ -324,7 +324,7 @@ bool LoopClosing::DetectLoop()
     //! msiArucoTrackID.insert();
     // mbExistLoopByAruco = false;
     if(mbExistLoopByAruco){
-        cout<<"DetectLoopByAruco====="<<endl;
+        cout<<"DetectLoopByAruco========================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================"<<endl;
         return true;
     }
     else if(mpCurrentKF->NA!=0 && !mbExistLoopByAruco){
@@ -411,7 +411,7 @@ bool LoopClosing::ComputeSim3ByAruco()
             {
                 continue;
             }
-            // cout<<"bNoMore = 0"<<endl;
+            cout<<"bNoMore = 0"<<endl;
             vector<MapPoint*> vpMapPointMatches(vvpMapPointMatches.size(), static_cast<MapPoint*>(NULL));
             for(size_t j=0, jend=vbInliers.size(); j<jend; j++)
             {
@@ -423,7 +423,7 @@ bool LoopClosing::ComputeSim3ByAruco()
             cv::Mat t = R_cur_m*tvec_m_can+tvec_cur_m;
             matcher.SearchBySim3(mpCurrentKF,pKF,vpMapPointMatches,1,R,t,7.5);
             const int nInliers = Optimizer::OptimizeSim3(mpCurrentKF, pKF, vpMapPointMatches, g_cur_can, 10, true);
-            // cout<<"nInliers>=15 ? = " <<(nInliers>=15)<<endl;
+            cout<<"nInliers>=15 ? = " <<(nInliers>=15)<<endl;
             if(nInliers>=15)
             {
                 mpMatchedKF = pKF;
@@ -454,7 +454,7 @@ bool LoopClosing::ComputeSim3ByAruco()
                     }
                 }
             }
-            // cout<<"SearchByProjection in computeSim3"<<endl;
+            cout<<"SearchByProjection in computeSim3"<<endl;
             matcher.SearchByProjection(mpCurrentKF, mScw, mvpLoopMapPoints, mvpCurrentMatchedPoints,10);
 
             // If enough matches accept Loop
@@ -464,10 +464,10 @@ bool LoopClosing::ComputeSim3ByAruco()
                 if(mvpCurrentMatchedPoints[i])
                     nTotalMatches++;
             }
-            // cout<<"nTotalMatches>=30 ? = " <<(nTotalMatches>=30)<<endl;
+            cout<<"nTotalMatches>=30 ? = " <<(nTotalMatches>=30)<<endl;
             if(nTotalMatches>=30)
             {
-                // cout<<"computesim3 SUCCESS! "<<endl;
+                cout<<"computesim3 SUCCESS! "<<endl;
                 return true;
             }
             else
@@ -477,7 +477,7 @@ bool LoopClosing::ComputeSim3ByAruco()
         }
     }
 
-    // cout<<"computesim3 FAILED: nTotalMatches < 30"<<endl;
+    cout<<"computesim3 FAILED: nTotalMatches < 30"<<endl;
     mpCurrentKF->SetErase();
     return false;
 }
@@ -683,19 +683,19 @@ void LoopClosing::CorrectLoopByAruco()
     KeyFrameAndPose CorrectedSim3, NonCorrectedSim3;
     CorrectedSim3[mpCurrentKF]=mg2oScw;
     cv::Mat Twc = mpCurrentKF->GetPoseInverse();
-    // cout<<"before get map mutex"<<endl;
+    cout<<"before get map mutex"<<endl;
     {
         // Get Map Mutex
         unique_lock<mutex> lock(mpMap->mMutexMapUpdate);
-        // cout<<"get map mutex"<<endl;
+        cout<<"get map mutex"<<endl;
 
         // 保存要校正的帧：即将修改的T，和原有的T
         for(vector<KeyFrame*>::iterator vit=mvpCurrentConnectedKFs.begin(), vend=mvpCurrentConnectedKFs.end(); vit!=vend; vit++)
         {
             KeyFrame* pKFi = *vit;
-            // cout<<"pKFi"<<endl;
+            cout<<"pKFi"<<endl;
             if(pKFi->isBad()){
-                // cout<<"pKFi->isBad()"<<endl;
+                cout<<"pKFi->isBad()"<<endl;
                 continue;
             }
 
@@ -718,7 +718,7 @@ void LoopClosing::CorrectLoopByAruco()
             //Pose without correction
             NonCorrectedSim3[pKFi]=g2oSiw;
         }
-        // cout<<"save KF poses"<<endl;
+        cout<<"save KF poses"<<endl;
         set<int> sAId;
         set<int> sModified;
         // Correct all MapPoints obsrved by current keyframe and neighbors, so that they align with the other side of the loop
@@ -775,26 +775,17 @@ void LoopClosing::CorrectLoopByAruco()
 
             cv::Mat correctedTiw = Converter::toCvSE3(eigR,eigt);
 
-            cout<<"pKFi->SetPose(correctedTiw);"<<endl;
             pKFi->SetPose(correctedTiw);
             
             //! 此处应该要修正Aruco的位置
-            cout<<"sAId.size() = "<<sAId.size()<<endl;
             for(set<int>::iterator sit=sAId.begin(); sit!=sAId.end(); sit++)
             {
-                // cout<<"修正Aruco的位置"<<endl;
                 int aid = *sit;
                 set<int>::iterator sfind = sModified.find(aid);
                 if(sfind!=sModified.end())
                     continue;
-                cout<<"idx = pKFi->mmArucoIdandIdx[aid]"<<endl;
-                bool hasAruco = pKFi->mmArucoIdandIdx.count(aid);
-                if(!hasAruco)
-                    continue;
                 int idx = pKFi->mmArucoIdandIdx[aid];
-                cout<<"pMA = pKFi->GetMapAruco(idx)"<<endl;
                 MapAruco* pMA = pKFi->GetMapAruco(idx);
-                cout<<"pMA is ok?"<<endl;
                 if(pMA)
                 {
                     if( !pMA->isBad()){

@@ -30,7 +30,6 @@
 #include "KeyFrameDatabase.h"
 #include "MapAruco.h"
 #include "InitKeyFrame.h"
-#include "MapPlane.h"
 
 #include <mutex>
 #include <opencv2/opencv.hpp>
@@ -46,7 +45,6 @@ class Frame;
 class KeyFrameDatabase;
 class MapAruco;
 class InitKeyFrame;
-class MapPlane;
 
 class KeyFrame
 {
@@ -106,8 +104,6 @@ public:
     void EraseMapArucoMatch(const size_t &idx);
     bool isIdxArucoOld(const size_t &idx);
     void SetIdxArucoOldFalse(const size_t &idx);
-    void AddMapPlane(MapPlane* pMPL);
-    vector<MapPlane*> GetAllMapPlanes();
 
     // KeyPoint functions
     std::vector<size_t> GetFeaturesInArea(const float &x, const float  &y, const float  &r) const;
@@ -236,7 +232,6 @@ protected:
     std::vector<MapAruco*> mvpMapArucos;
     std::vector<MapPoint*> mvpArucoMPs;
     std::vector<bool> mvbOldAruco;
-    std::set<MapPlane*> mspMapPlanes;
 
     // BoW
     KeyFrameDatabase* mpKeyFrameDB;

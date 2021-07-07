@@ -88,8 +88,6 @@ protected:
     void CreateArucoMapPoints();
     Eigen::Vector4d PlaneFitting(const std::vector<Eigen::Vector3d> &plane_pts, Eigen::Vector3d &center);
     void MapPointRelatedAruco();
-    void ProcessPlane();
-    void MergePlane();
 
     void MapPointCulling();
     void SearchInNeighbors();

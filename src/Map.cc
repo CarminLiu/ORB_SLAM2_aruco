@@ -116,12 +116,6 @@ void Map::EraseKeyFrame(KeyFrame *pKF)
     // Delete the MapPoint
 }
 
-void Map::EraseMapPlane(MapPlane *pMPL)
-{
-    unique_lock<mutex> lock(mMutexMap);
-    mspMapPlanes.erase(pMPL);
-}
-
 void Map::SetReferenceMapPoints(const vector<MapPoint *> &vpMPs)
 {
     unique_lock<mutex> lock(mMutexMap);

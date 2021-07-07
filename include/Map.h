@@ -51,33 +51,28 @@ public:
 
     void AddKeyFrame(KeyFrame* pKF);
     void AddMapPoint(MapPoint* pMP);
-    void AddMapAruco(MapAruco* pMA);
-    void AddMapPlane(MapPlane* pMPL);
-
     void EraseMapPoint(MapPoint* pMP);
     void EraseKeyFrame(KeyFrame* pKF);
-    void EraseMapAruco(MapAruco* pMA);
-    void EraseMapPlane(MapPlane* pMPL);
-
     void SetReferenceMapPoints(const std::vector<MapPoint*> &vpMPs);
     void InformNewBigChange();
     int GetLastBigChangeIdx();
 
-    // add by liujiamin  
-    void UpdateAruco();  
+    // add by liujiamin
+    void AddMapAruco(MapAruco* pMA);
+    std::vector<MapAruco*> GetAllMapArucos();
+    void UpdateAruco();
+    std::vector<int> GetAllMapArucoID();
+    void EraseMapAruco(MapAruco* pMA);
+    bool HasMapAruco(const int &idx);
+    MapAruco* GetMapAruco(const int &idx);
     // void AddArucoMapPointsID(int id);
     // std::vector<int> GetAllArucoMapPointID();
     // void AddArucoMapPoint(MapPoint* pAMP);
-    
-    
+    void AddMapPlane(MapPlane* pMPL);
+    std::vector<MapPlane*> GetAllMapPlanes();
 
     std::vector<KeyFrame*> GetAllKeyFrames();
     std::vector<MapPoint*> GetAllMapPoints();
-    std::vector<MapAruco*> GetAllMapArucos();
-    std::vector<MapPlane*> GetAllMapPlanes();
-    bool                   HasMapAruco(const int &idx);
-    MapAruco*              GetMapAruco(const int &idx);
-    std::vector<int>       GetAllMapArucoID();
     std::vector<MapPoint*> GetReferenceMapPoints();
 
     long unsigned int MapPointsInMap();

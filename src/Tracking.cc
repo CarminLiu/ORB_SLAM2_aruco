@@ -787,7 +787,7 @@ void Tracking::CreateInitialMapMonocular()
                     pMPL->AddMapAruco(pNewMA);
                     pNewMA->AddMapPlane(pMPL);
                     IsInsert = true;
-                    break;  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    break;
                 }
             }
             
@@ -803,7 +803,6 @@ void Tracking::CreateInitialMapMonocular()
             pNewMPL->AddMapAruco(pNewMA);
             pNewMA->AddMapPlane(pNewMPL);   
             mpMap->AddMapPlane(pNewMPL);
-            pKFini->AddMapPlane(pNewMPL);
         }
 
         // associate aruco with the second kf
@@ -813,8 +812,6 @@ void Tracking::CreateInitialMapMonocular()
             if(jd == xM.id) {
                 pNewMA->AddObservation(pKFcur,j);
                 pKFcur->AddMapAruco(pNewMA,j);
-                MapPlane* pMPL = pNewMA->GetPlane();
-                pKFcur->AddMapPlane(pMPL);
                 mCurrentFrame.mvpMapArucos[j]=pNewMA;
             }
         }
@@ -889,7 +886,6 @@ void Tracking::CreateInitialMapMonocular()
                 pNewMPL->AddMapAruco(pNewMA);
                 pNewMA->AddMapPlane(pNewMPL);   
                 mpMap->AddMapPlane(pNewMPL);
-                pKFcur->AddMapPlane(pNewMPL);
             }
         }
     }
@@ -1599,7 +1595,6 @@ void Tracking::CreateNewKeyFrame()
                     pNewMPL->AddMapAruco(pNewMA);
                     pNewMA->AddMapPlane(pNewMPL);   
                     mpMap->AddMapPlane(pNewMPL);
-                    pKF->AddMapPlane(pNewMPL);
                 }
             }
         }

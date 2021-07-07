@@ -247,18 +247,6 @@ void KeyFrame::AddMapAruco(MapAruco* pMA, const size_t &idx)
     // cout<<"\t"<<mvpMapArucos[idx]->GetMapArucoID()<<endl;
 }
 
-void KeyFrame::AddMapPlane(MapPlane* pMPL)
-{
-    unique_lock<mutex> lock(mMutexFeatures);
-    mspMapPlanes.insert(pMPL);
-}
-
-vector<MapPlane*> KeyFrame::GetAllMapPlanes()
-{
-    unique_lock<mutex> lock(mMutexFeatures);
-    return vector<MapPlane*>(mspMapPlanes.begin(), mspMapPlanes.end());
-}
-
 void KeyFrame::AddArucoMapPoint(MapPoint *pAMP, const size_t &idx)
 {
     unique_lock<mutex> lock(mMutexFeatures);

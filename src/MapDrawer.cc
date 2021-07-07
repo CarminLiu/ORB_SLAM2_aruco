@@ -123,29 +123,29 @@ void MapDrawer::DrawAruco()
     {
         if(vpMAs[i])
         {
-            int plId = vpMAs[i]->GetPlane()->GetID();
+            //int plId = vpMAs[i]->GetPlane()->GetID();
             
-            cv::Vec3b v3 = GetColor(plId); 
-            glLineWidth(mKeyFrameLineWidth);
-            float a =(float)v3(0)/255;
-            float b =(float)v3(1)/255;
-            float c =(float)v3(2)/255;
+            // cv::Vec3b v3 = GetColor(1); 
+            // glLineWidth(mKeyFrameLineWidth*2);
+            // float a =(float)v3(0)/255;
+            // float b =(float)v3(1)/255;
+            // float c =(float)v3(2)/255;
 
-            glColor3f(a,b,c);
-            glBegin(GL_POLYGON);
+            // glColor3f(a,b,c);
+            // glBegin(GL_POLYGON);
 
             cv::Mat m0 = vpMAs[i]->GetPosInWorld(0);
             cv::Mat m1 = vpMAs[i]->GetPosInWorld(1);
             cv::Mat m2 = vpMAs[i]->GetPosInWorld(2);
             cv::Mat m3 = vpMAs[i]->GetPosInWorld(3);
 
-            glVertex3f(m0.at<float>(0),m0.at<float>(1),m0.at<float>(2));
-            glVertex3f(m1.at<float>(0),m1.at<float>(1),m1.at<float>(2));
-            glVertex3f(m2.at<float>(0),m2.at<float>(1),m2.at<float>(2));
-            glVertex3f(m3.at<float>(0),m3.at<float>(1),m3.at<float>(2));
+            // glVertex3f(m0.at<float>(0),m0.at<float>(1),m0.at<float>(2));
+            // glVertex3f(m1.at<float>(0),m1.at<float>(1),m1.at<float>(2));
+            // glVertex3f(m2.at<float>(0),m2.at<float>(1),m2.at<float>(2));
+            // glVertex3f(m3.at<float>(0),m3.at<float>(1),m3.at<float>(2));
         
 
-            glEnd();
+            // glEnd();
 
             glColor3f(0.0f, 0.5f, 0.0f);
             glBegin(GL_LINES);
