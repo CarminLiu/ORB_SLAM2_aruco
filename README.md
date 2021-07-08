@@ -38,7 +38,7 @@ I learn a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), an
 5. Modify a lot in class Optimizer, class Map, class Initializer.
 6. Modify a little in class frame, class MapPoint, class MapDrawer, class Keyframe.
 7. Add file InitKeyFrame.h, SystemSetting.h to save the map. 
-8. Add Aruco in the Thirdparty file.
+8. Add Aruco in the Thirdparty folder.
 
 ### Run
 
