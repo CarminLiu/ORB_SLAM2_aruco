@@ -2,9 +2,9 @@
 
 This SLAM system is based on [ORB_SLAM2](https://github.com/raulmur/ORB_SLAM2.git).
 
-I add fiducial marker--Aruco to deal with scale problem, scale drift, and tracking in large-scale environment.
+I added fiducial markers--Aruco to obtain the scale, decrease scale drift, and track in large-scale environment.
 
-I learn a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), and modified the code from my personal understanding.
+I learned a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), and wrote the codes from my personal understanding.
 
 <img src="map1.png" alt="map1" style="zoom:20%;" />
 
@@ -14,31 +14,31 @@ I learn a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), an
 
 ### Function:
 
-1. Initializing map by Aruco or Keypoints. If initial by Keypoints, there is a module to correct scale.(In the LocalMapping thread, I commented this code because I usually use aruco to initial map. But it still work)
-2. Tracking by MapPoint and MapAruco.
-3. LocalMapping thread can update all features and keyframe.
-4. Detecting Loop by MapAruco or MapPoints. It also can correct loop by aruco and do global BA.
-5. Show Aruco when draw the map.
+1. It can initialize map by Aruco or Keypoints. If initial by Keypoints, there is a module to correct scale.(In the LocalMapping thread, I commented this code because I usually use aruco to initial map. But it still work)
+2. It can track by MapPoint and MapAruco features.
+3. It can update all features and keyframe in localMapping thread.
+4. It can detect and correct loop by MapAruco or MapPoints, and update all features in the global bundle adjustment.
+5. It can show Aruco in the map.
 
 ### Details:
 
-1. Use MapAruco to represent marker features, see in MapAruco.h file.
-2. In tracking thread, modified and add:
-   -  MonocularInitialization(): include the way initialized by Aruco.
+1. Using MapAruco to represent marker features( in "MapAruco.h" file).
+2. Modifying and adding these in Tracking thread:
+   -  MonocularInitialization(): including the way to initialize by Aruco.
    -  TrackByAruco()
    -  RelocalizationByAruco()
-   -  NeedNewKeyFrame(): KeyFrame is needed when there is new Aruco.
+   -  NeedNewKeyFrame(): Adding a KeyFrame when there is a new Aruco.
    -  CreateNewKeyFrame(): Creating new MapAruco features.
-3. In LocalMapping thread, modified and add:
+3. Modifying and adding these in LocalMapping thread:
    - CreateArucoMapPoints(): to correct scale
-4. In LoopClosing thread, modified and add:
+4. Modifying and adding these in LoopClosing thread:
    - DetectLoopByAruco()
    - ComputeSim3ByAruco();
    - CorrectLoopByAruco();
-5. Modify a lot in class Optimizer, class Map, class Initializer.
-6. Modify a little in class frame, class MapPoint, class MapDrawer, class Keyframe.
-7. Add file InitKeyFrame.h, SystemSetting.h to save the map. 
-8. Add Aruco in the Thirdparty folder.
+5. Modifying a lot in class Optimizer, class Map, and class Initializer.
+6. Modifying a little in class frame, class MapPoint, class MapDrawer, and class Keyframe.
+7. Adding file "InitKeyFrame.h", "SystemSetting.h" to save the map. 
+8. Adding Aruco in the Thirdparty folder.
 
 ### Run
 
