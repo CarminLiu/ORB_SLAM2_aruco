@@ -1,3 +1,5 @@
+I'm now adding some new features in this program. I will open the whole source when I finish it. Please be waiting.
+
 # ORB_SLAM2_aruco
 
 This SLAM system is based on [ORB_SLAM2](https://github.com/raulmur/ORB_SLAM2.git).
@@ -20,35 +22,15 @@ I learned a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), 
 4. It can detect and correct loop by MapAruco or MapPoints, and update all features in the global bundle adjustment.
 5. It can show Aruco in the map.
 
-### Details:
+## Notice:
 
-1. Using MapAruco to represent marker features( in "MapAruco.h" file).
-2. Modifying and adding these in Tracking thread:
-   -  MonocularInitialization(): including the way to initialize by Aruco.
-   -  TrackByAruco()
-   -  RelocalizationByAruco()
-   -  NeedNewKeyFrame(): Adding a KeyFrame when there is a new Aruco.
-   -  CreateNewKeyFrame(): Creating new MapAruco features.
-3. Modifying and adding these in LocalMapping thread:
-   - CreateArucoMapPoints(): to correct scale
-4. Modifying and adding these in LoopClosing thread:
-   - DetectLoopByAruco()
-   - ComputeSim3ByAruco();
-   - CorrectLoopByAruco();
-5. Modifying a lot in class Optimizer, class Map, and class Initializer.
-6. Modifying a little in class frame, class MapPoint, class MapDrawer, and class Keyframe.
-7. Adding file "InitKeyFrame.h", "SystemSetting.h" to save the map. 
-8. Adding Aruco in the Thirdparty folder.
+The code in `/Examples/Monocular/mono_cvcam.cc` is come from [SPM-SLAM](http://www.uco.es/investiga/grupos/ava/node/58) 
 
-### Run
+### Citation
 
-```bash
-./mono_tum path_to_vocabulary    videofile  cameraparams.yml outposes ARUCO_DIC 
-```
+R. Mur-Artal, J. M. M. Montiel, and J. D. Tardos, “ORB-SLAM: a Versatile and Accurate Monocular SLAM System,” IEEE Transactions on Robotics, vol. 31, no. 5, pp. 1147–1163, 2015.
 
-like:
+Rafael Muñoz-Salinas,Manuel J. Marín-Jiménez Manuel and Rafael Medina-Carnicer , "SPM-SLAM: Simultaneous Localization and Mapping with Squared Planar Markers", September 2018 Pattern Recognition DOI: 10.1016/j.patcog.2018.09.003
 
-```
-./Examples/Monocular/mono_cvcam Vocabulary/ORBvoc.txt /home/(user name)/data/spm-slam/video1.mp4 /home/(user name)/data/spm-slam/camera1.yml /home/(user name)/data/spm-slam/save-pose-file-name.txt ARUCO  
-```
+Rafael Muñoz-Salinas, R. Medina-Carnicer, "UcoSLAM: Simultaneous localization and mapping by fusion of keypoints and squared planar markers," Pattern Recognition, 2020,107193
 
