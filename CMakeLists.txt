@@ -71,11 +71,8 @@ src/Initializer.cc
 src/Viewer.cc
 src/MapAruco.cc
 g2oAddition/EdgeMarker.cpp
-g2oAddition/EdgePlane.cpp
-g2oAddition/vertex_plane.cpp
 src/SystemSetting.cc
 src/InitKeyFrame.cc
-src/MapPlane.cc
 )
 
 target_link_libraries(${PROJECT_NAME}

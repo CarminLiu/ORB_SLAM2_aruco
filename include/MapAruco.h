@@ -10,7 +10,6 @@
 #include "KeyFrame.h"
 #include "Map.h"
 #include "MapPoint.h"
-#include "MapPlane.h"
 #include "Thirdparty/aruco/aruco/aruco.h"
 #include <opencv2/core/core.hpp>
 #include <mutex>
@@ -23,7 +22,6 @@ class Frame;
 class KeyFrame;
 class Map;
 class MapPoint;
-class MapPlane;
 
 // This class is like MapPoint
 class MapAruco
@@ -46,13 +44,11 @@ public:
     int     Observations();
     std::map<KeyFrame*, size_t> GetObservations();
     std::vector<int>            GetAllObsKFsId();
-    void    AddMapPlane(MapPlane* pMPL);
     
     int     GetMapArucoID();
     double  GetArucoLength();
     MapPoint*     GetMapPoint(const size_t & idx);
     aruco::Marker GetAruco();
-    MapPlane*     GetPlane();
     
     cv::Point3f get3DPointsLocalRefSystem(size_t i);
     
@@ -96,7 +92,6 @@ protected:
     // Keyframes observing the aruco and associated index in keyframe
     std::map<KeyFrame*,size_t> mObservations;
     std::set<int> mObsKFid;
-    MapPlane* mPlane;
 
     std::mutex mMutexFeatures;
     std::mutex mMutexPos;

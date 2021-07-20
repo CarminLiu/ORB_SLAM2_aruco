@@ -49,8 +49,6 @@ public:
 
 private:
 
-    cv::Vec3b GetColor(int i);
-
     float mKeyFrameSize;
     float mKeyFrameLineWidth;
     float mGraphLineWidth;

@@ -21,3 +21,5 @@ joinlines.pcd
 other.pcd
 orbfile.yml
 g2o/
+run/
+.gitignore

@@ -53,12 +53,6 @@ void Map::AddMapAruco(MapAruco* pMA)
     mmIdAndAruco[pMA->GetMapArucoID()] = pMA;
 }
 
-void Map::AddMapPlane(MapPlane* pMPL)
-{
-    unique_lock<mutex> lock(mMutexMap);
-    mspMapPlanes.insert(pMPL);
-}
-
 std::vector<int> Map::GetAllMapArucoID()
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -147,18 +141,6 @@ std::vector<MapAruco*> Map::GetAllMapArucos()
     return vector<MapAruco*>(mspMapArucos.begin(),mspMapArucos.end());
 }
 
-vector<MapPlane*> Map::GetAllMapPlanes()
-{
-    unique_lock<mutex> lock(mMutexMap);
-    return vector<MapPlane*>(mspMapPlanes.begin(),mspMapPlanes.end());
-}
-
-// std::vector<int> Map::GetAllArucoMapPointID()
-// {
-//     unique_lock<mutex> lock(mMutexMap);
-//     return vector<int>(msAMPsid.begin(), msAMPsid.end());
-// }
-
 vector<MapPoint*> Map::GetAllMapPoints()
 {
     unique_lock<mutex> lock(mMutexMap);
@@ -201,13 +183,9 @@ void Map::clear()
     for(set<MapAruco*>::iterator sit=mspMapArucos.begin(), send=mspMapArucos.end(); sit!=send; sit++)
         delete *sit;
 
-    for(set<MapPlane*>::iterator sit=mspMapPlanes.begin(), send=mspMapPlanes.end(); sit!=send; sit++)
-        delete *sit;
-
     mspMapPoints.clear();
     mspKeyFrames.clear();
     mspMapArucos.clear();
-    mspMapPlanes.clear();
     mnMaxKFid = 0;
     mvpReferenceMapPoints.clear();
     mvpKeyFrameOrigins.clear();
@@ -216,15 +194,7 @@ void Map::clear()
 void Map::UpdateAruco()
 {
     unique_lock<mutex> lock(mMutexMap);
-    // vector<int> vKFid;
-    // vector<KeyFrame*> vkf = this->GetAllKeyFrames();
-    // long unsigned int numkf = vkf.size();
-    // for(size_t i=0; i<numkf; i++)
-    // {
-    //     KeyFrame* pk = vkf[i];
-    //     int id = pk->mnId;
-    //     vKFid.push_back(id);
-    // }
+    
     for(set<MapAruco*>::iterator sit=mspMapArucos.begin(), send=mspMapArucos.end(); sit!=send; sit++)
     {
         MapAruco* pA = *sit;
@@ -242,14 +212,6 @@ void Map::UpdateAruco()
             }
         }
         cout<<endl;
-        // long unsigned int refkfid = pA->GetFirstKFid();
-        // for(long unsigned int i=0; i<numkf; i++) {
-        //     if(vKFid[i] == refkfid) {
-        //         pA->SetRtwmByKeyFrame(vkf[i]->GetRotation().t(), vkf[i]->GetCameraCenter());
-                
-        //         break;
-        //     }
-        // }
     }
     // cout<<"Update Aruco"<<endl;
 }

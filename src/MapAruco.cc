@@ -173,12 +173,6 @@ std::vector<int> MapAruco::GetAllObsKFsId()
     return vector<int>(mObsKFid.begin(), mObsKFid.end());
 }
 
-void MapAruco::AddMapPlane(MapPlane* pMPL)
-{
-    unique_lock<mutex> lock(mMutexFeatures);
-    mPlane = pMPL;
-}
-
 int MapAruco::GetMapArucoID()
 {
     unique_lock<mutex> lock(mMutexFeatures);
@@ -189,12 +183,6 @@ aruco::Marker MapAruco::GetAruco()
 {
     unique_lock<mutex> lock(mMutexFeatures);
     return mAruco;
-}
-
-MapPlane* MapAruco::GetPlane()
-{
-    unique_lock<mutex> lock(mMutexFeatures);
-    return mPlane;
 }
 
 int MapAruco::Observations()

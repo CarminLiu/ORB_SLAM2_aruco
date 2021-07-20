@@ -28,7 +28,6 @@
 #include "Converter.h"
 #include "SystemSetting.h"
 #include "InitKeyFrame.h"
-#include "MapPlane.h"
 
 #include <mutex>
 
@@ -42,7 +41,6 @@ class KeyFrame;
 class MapAruco;
 class SystemSetting;
 class InitKeyFrame;
-class MapPlane;
 
 class Map
 {
@@ -65,11 +63,6 @@ public:
     void EraseMapAruco(MapAruco* pMA);
     bool HasMapAruco(const int &idx);
     MapAruco* GetMapAruco(const int &idx);
-    // void AddArucoMapPointsID(int id);
-    // std::vector<int> GetAllArucoMapPointID();
-    // void AddArucoMapPoint(MapPoint* pAMP);
-    void AddMapPlane(MapPlane* pMPL);
-    std::vector<MapPlane*> GetAllMapPlanes();
 
     std::vector<KeyFrame*> GetAllKeyFrames();
     std::vector<MapPoint*> GetAllMapPoints();
@@ -104,9 +97,6 @@ protected:
     std::set<MapAruco*> mspMapArucos;
     std::set<int>       msMAid;
     unordered_map<int, MapAruco*> mmIdAndAruco;
-    // std::set<int> msAMPsid;
-    // std::set<MapPoint*> mspArucoMapPoints;
-    std::set<MapPlane*> mspMapPlanes;
 
     std::vector<MapPoint*> mvpReferenceMapPoints;
 

@@ -58,47 +58,6 @@ public:
 
 };
 
-class EdgeMapPointInAruco: public BaseUnaryEdge<1, double, VertexSBAPointXYZ>
-{
-public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-
-    EdgeMapPointInAruco(const cv::Mat &R, const cv::Mat &t) {
-        a = R.at<float>(0,2);
-        b = R.at<float>(1,2);
-        c = R.at<float>(2,2);
-        nor = sqrt(a*a + b*b + c*c);
-        a = a/nor;
-        b = b/nor;
-        c = c/nor;
-        d = - cv::norm(t); // 注意负号
-    }
-
-    virtual bool read(std::istream& is);
-
-    virtual bool write(std::ostream& os) const;
-
-    void computeError()
-    {
-        const VertexSBAPointXYZ* v1 = static_cast<const VertexSBAPointXYZ*>(_vertices[0]);
-        const Eigen::Vector3d v3d = v1->estimate();
-
-        double obs = _measurement;
-        
-        double dis = abs(a*v3d(0) + b*v3d(1) + c*v3d(2) + d);
-        double m = dis;
-        _error(0,0) = 0;
-        // cout<<m<<endl;
-    }
-
-    // virtual void linearizeOplus();
-
-    double a, b, c, d; // params for Aruco plane
-    double nor;
-
-};
-
-
 } // namespace g2o
 
 

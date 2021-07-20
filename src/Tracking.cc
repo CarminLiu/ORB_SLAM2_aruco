@@ -225,7 +225,6 @@ void Tracking::Track()
             {
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
-                // cout<<"#planes:\t"<< mpMap->GetAllMapPlanes().size()<<endl;
 
                 // add TrackByAruco() !!! 这里忽略了很多条件，首先假设第一二帧都有marker
                 // TODO 先做一个判断，判断是否有良好的Aruco可以提供初值
@@ -737,7 +736,6 @@ void Tracking::CreateInitialMapMonocular()
 
     // 先全局优化之后加上Aruco的信息
     // 1.pKFini; 2.pKFcur.
-    // TODO: 顺便创建PLANES
     vector<int> viId;
     float s = 0.165;
     for(size_t i=0; i<mInitialFrame.NA; i++)
@@ -754,57 +752,6 @@ void Tracking::CreateInitialMapMonocular()
         mpMap->AddMapAruco(pNewMA);
         mInitialFrame.mvpMapArucos[i]=pNewMA;
         
-        // create/associate plane first
-        cv::Mat normal = pNewMA->GetTwm().rowRange(0,3).col(2); //R.col(3) 
-        Eigen::Vector3d norNA(normal.at<float>(0,0), normal.at<float>(1,0), normal.at<float>(2,0));
-        cv::Mat tw2m = pNewMA->Gettw2m();
-        Eigen::Vector3d NAcenter(tw2m.at<float>(0,0), tw2m.at<float>(1,0), tw2m.at<float>(2,0));
-        
-        vector<MapPlane*> vpMPL = mpMap->GetAllMapPlanes();
-        int cnt=0;
-        for(size_t p=0; p<vpMPL.size(); p++)
-        {
-            MapPlane* pMPL = vpMPL[p];
-            bool IsInsert = false;
-
-            Eigen::Vector3d pN = pMPL->GetNormal();
-            
-            double dot = pN.dot(norNA);
-            double cross = (pN.cross(norNA)).norm();
-            double theta = atan2(cross, dot);
-            double angle = theta*180/M_PI;
-            cout<< "angle = "<< angle << endl;
-            
-            if(angle < 30)
-            {
-                Eigen::Vector3d pInPl = pMPL->GetOnePoint();
-                Eigen::Vector3d vec2P = NAcenter - pInPl;
-                double dToPlane = abs(vec2P.dot(pN));
-                cout<<"dToPlane = "<<dToPlane<<endl;
-
-                if(dToPlane < 0.1)
-                {
-                    pMPL->AddMapAruco(pNewMA);
-                    pNewMA->AddMapPlane(pMPL);
-                    IsInsert = true;
-                    break;
-                }
-            }
-            
-            //if not suit
-            if(IsInsert == false)
-                cnt++;
-        }
-        if(cnt == vpMPL.size())
-        {
-            //create a new MapPlane
-            MapPlane* pNewMPL = new MapPlane(pNewMA->GetTwm(), mpMap);
-            cout<<"new MapPlane(normal, dis, mpMap);"<<endl;
-            pNewMPL->AddMapAruco(pNewMA);
-            pNewMA->AddMapPlane(pNewMPL);   
-            mpMap->AddMapPlane(pNewMPL);
-        }
-
         // associate aruco with the second kf
         for(size_t j=0; j<mCurrentFrame.NA; j++)
         {
@@ -838,55 +785,7 @@ void Tracking::CreateInitialMapMonocular()
             mpMap->AddMapAruco(pNewMA); 
             mCurrentFrame.mvpMapArucos[i]=pNewMA;
 
-            // create/associate plane first
-            cv::Mat normal = pNewMA->GetTwm().rowRange(0,3).col(2); //R.col(3) 
-            Eigen::Vector3d norNA(normal.at<float>(0,0), normal.at<float>(1,0), normal.at<float>(2,0));
-            cv::Mat tw2m = pNewMA->Gettw2m();
-            Eigen::Vector3d NAcenter(tw2m.at<float>(0,0), tw2m.at<float>(1,0), tw2m.at<float>(2,0));
             
-            vector<MapPlane*> vpMPL = mpMap->GetAllMapPlanes();
-            int cnt=0;
-            for(size_t p=0; p<vpMPL.size(); p++)
-            {
-                MapPlane* pMPL = vpMPL[p];
-                bool IsInsert = false;
-
-                Eigen::Vector3d pN = pMPL->GetNormal();
-                
-                double dot = pN.dot(norNA);
-                double cross = (pN.cross(norNA)).norm();
-                double theta = atan2(cross, dot);
-                double angle = theta*180/M_PI;
-                cout<< "angle = "<< angle << endl;
-                
-                if(angle < 30)
-                {
-                    Eigen::Vector3d pInPl = pMPL->GetOnePoint();
-                    Eigen::Vector3d vec2P = NAcenter - pInPl;
-                    double dToPlane = abs(vec2P.dot(pN));
-                    cout<<"dToPlane = "<<dToPlane<<endl;
-
-                    if(dToPlane < 0.1)
-                    {
-                        pMPL->AddMapAruco(pNewMA);
-                        pNewMA->AddMapPlane(pMPL);
-                        IsInsert = true;
-                    }
-                }
-                
-                //if not suit
-                if(IsInsert == false)
-                    cnt++;
-            }
-            if(cnt == vpMPL.size())
-            {
-                //create a new MapPlane
-                MapPlane* pNewMPL = new MapPlane(pNewMA->GetTwm(), mpMap);
-                cout<<"new MapPlane(normal, dis, mpMap);"<<endl;
-                pNewMPL->AddMapAruco(pNewMA);
-                pNewMA->AddMapPlane(pNewMPL);   
-                mpMap->AddMapPlane(pNewMPL);
-            }
         }
     }
 
@@ -1546,56 +1445,6 @@ void Tracking::CreateNewKeyFrame()
                 mCurrentFrame.mvpMapArucos[i]=pNewMA;
                 cout<<"-----ckf-------New Aruco's ID: "<<xM.id<<endl;
 
-                // create/associate plane first
-                cv::Mat normal = pNewMA->GetTwm().rowRange(0,3).col(2); //R.col(3) 
-                Eigen::Vector3d norNA(normal.at<float>(0,0), normal.at<float>(1,0), normal.at<float>(2,0));
-                cv::Mat tw2m = pNewMA->Gettw2m();
-                Eigen::Vector3d NAcenter(tw2m.at<float>(0,0), tw2m.at<float>(1,0), tw2m.at<float>(2,0));
-                
-                vector<MapPlane*> vpMPL = mpMap->GetAllMapPlanes();
-                int cnt=0;
-                for(size_t p=0; p<vpMPL.size(); p++)
-                {
-                    MapPlane* pMPL = vpMPL[p];
-                    bool IsInsert = false;
-
-                    Eigen::Vector3d pN = pMPL->GetNormal();
-                    
-                    double dot = pN.dot(norNA);
-                    double cross = (pN.cross(norNA)).norm();
-                    double theta = atan2(cross, dot);
-                    double angle = theta*180/M_PI;
-                    cout<< "angle = "<< angle << endl;
-                    
-                    if(angle < 30)
-                    {
-                        Eigen::Vector3d pInPl = pMPL->GetOnePoint();
-                        Eigen::Vector3d vec2P = NAcenter - pInPl;
-                        double dToPlane = abs(vec2P.dot(pN));
-                        cout<<"dToPlane = "<<dToPlane<<endl;
-
-                        if(dToPlane < 0.1)
-                        {
-                            pMPL->AddMapAruco(pNewMA);
-                            pNewMA->AddMapPlane(pMPL);
-                            IsInsert = true;
-                            break;
-                        }
-                    }
-                    
-                    //if not suit
-                    if(IsInsert == false)
-                        cnt++;
-                }
-                if(cnt == vpMPL.size())
-                {
-                    //create a new MapPlane
-                    MapPlane* pNewMPL = new MapPlane(pNewMA->GetTwm(), mpMap);
-                    cout<<"new MapPlane(normal, dis, mpMap);"<<endl;
-                    pNewMPL->AddMapAruco(pNewMA);
-                    pNewMA->AddMapPlane(pNewMPL);   
-                    mpMap->AddMapPlane(pNewMPL);
-                }
             }
         }
     }
