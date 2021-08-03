@@ -8,9 +8,9 @@ I added fiducial markers--Aruco to obtain the scale, decrease scale drift, and t
 
 I learned a lot from [UcoSLAM](http://www.uco.es/investiga/grupos/ava/node/62), and wrote the codes from my personal understanding.
 
-<img src="map1.png" alt="map1" style="zoom:20%;" />
+<img src="pic4.png" alt="map1"  />
 
-<img src="large-scene2.png" alt="large-scene2" style="zoom:20%;" />
+![pic5](pic5.png)
 
 
 
