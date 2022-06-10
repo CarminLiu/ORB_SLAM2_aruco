@@ -125,3 +125,6 @@ add_executable(mono_cvcam
 Examples/Monocular/mono_cvcam.cc)
 target_link_libraries(mono_cvcam ${PROJECT_NAME})
 
+add_executable(mono_marker
+Examples/Monocular/mono_marker.cc)
+target_link_libraries(mono_marker ${PROJECT_NAME})

@@ -12,7 +12,7 @@ mutex MapAruco::mGlobalMutex;
 
 MapAruco::MapAruco(const aruco::Marker& pM, KeyFrame* pRefKF, Map* pMap, double length):
 nObs(0), mbAddLocalBA(false), mnCorrectedByKF(0), 
-mbBad(false), mpMap(pMap)
+mbBad(false), mpMap(pMap), nBadComputed(0), isWellComputed(false)
 {
     // cout<<"It's in the constuction..."<<endl;
     mAruco = pM; // 此mAruco会保存他在当前帧上的像素位置

@@ -73,6 +73,9 @@ public:
 
     static std::mutex mGlobalMutex;
 
+    int nBadComputed;
+    bool isWellComputed;
+
 protected:
     aruco::Marker mAruco;
     cv::Mat mRcm;
